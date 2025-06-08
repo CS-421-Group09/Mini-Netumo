@@ -9,15 +9,31 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
+# Set working directory
 WORKDIR /var/www
 
+# Copy composer files first (for caching)
+COPY composer.json composer.lock ./
+
+# Install Composer dependencies (no scripts, just vendor)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+
+# Copy the rest of the app (including artisan)
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+# Now run composer install again, this time with scripts
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-EXPOSE 9000
+# Install Nginx
+RUN apt-get update && apt-get install -y nginx
 
-CMD ["php-fpm"]
+# Copy Nginx config
+COPY ./nginx.conf /etc/nginx/sites-available/default
+
+EXPOSE 80
+
+# Start both php-fpm and nginx
+CMD service nginx start && php-fpm

@@ -1,5 +1,8 @@
 # Netumo Monitoring Microservice
 
+**Live Demo:** [http://16.171.253.227/](http://16.171.253.227/)
+**API Base URL:** [http://16.171.253.227/](http://16.171.253.227/)
+
 ## Overview
 
 Netumo is a production-style microservice project for scheduled monitoring, SSL/domain checks, and contextual notifications. It uses Docker Compose to orchestrate multiple services including a React frontend, Laravel backend API, worker, MySQL, Redis, and Nginx load balancer.
@@ -186,3 +189,32 @@ docker-compose down
 ## 12. License
 
 - MIT or as specified in the repository.
+
+---
+
+## Post-Deployment Checklist
+
+- [ ] Visit your EC2 public IP in a browser and verify the dashboard loads and all features work.
+- [ ] Test email notifications (Mailtrap/SES) by simulating a downtime or SSL/domain expiry event.
+- [ ] Test webhook notifications (Slack/Discord) by simulating a downtime or SSL/domain expiry event.
+- [ ] Check that daily database backups are being created in `/var/backups/netumo` on the server.
+
+## Database Backups
+
+A daily backup script (`backup_db.sh`) is provided. To schedule automatic daily backups, add this line to your crontab on the EC2 instance:
+
+```bash
+0 2 * * * /bin/bash /home/ec2-user/Mini-Netumo/backup_db.sh
+```
+
+This will run the backup every day at 2:00 AM server time.
+
+## Database Connection Pooling
+
+Laravel uses persistent connections by default if configured. Ensure your `.env` contains:
+
+```env
+DB_CONNECTION=mysql
+```
+
+For advanced pooling, consider using a MySQL proxy (e.g., ProxySQL) if required by your rubric.
