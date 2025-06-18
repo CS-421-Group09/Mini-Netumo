@@ -12,7 +12,7 @@ export default function Login({ setToken }) {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:8000/api/login', {
+      const res = await fetch('http://16.171.253.227/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,6 +64,7 @@ export default function Login({ setToken }) {
             autoFocus
             onChange={e => setEmail(e.target.value)}
             placeholder="Enter your email"
+            autoComplete="username"
             required
           />
         </div>
@@ -74,6 +75,7 @@ export default function Login({ setToken }) {
             value={password}
             onChange={e => setPassword(e.target.value)}
             placeholder="Enter your password"
+            autoComplete="current-password"
             required
           />
         </div>
